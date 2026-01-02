@@ -51,7 +51,7 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 sh '''
-                kubectl apply -f k8s/mongodb/
+                kubectl apply -f k8s/mongo/
                 kubectl apply -f k8s/backend/
                 kubectl apply -f k8s/frontend/
                 kubectl apply -f k8s/ingress/
