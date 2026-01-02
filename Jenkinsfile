@@ -5,7 +5,7 @@ pipeline {
         AWS_REGION = "ap-south-1"
         ECR_BACKEND = "212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-backend"
         ECR_FRONTEND = "212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-frontend"
-        KUBECONFIG = "/home/ubuntu/.kube/config"
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
     }
 
     stages {
