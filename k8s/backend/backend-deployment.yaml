@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: 212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-backend:latest
+        ports:
+        - containerPort: 3500
+        env:
+        - name: MONGO_CONN_STR
+          valueFrom:
+            secretKeyRef:
+              name: backend-secret
+              key: MONGO_CONN_STR
+        - name: NODE_ENV
+          valueFrom:
+            secretKeyRef:
+              name: backend-secret
+              key: NODE_ENV

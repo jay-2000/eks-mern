@@ -1,0 +1,115 @@
+########################################
+# 🔐 SECURITY — NEVER COMMIT SECRETS
+########################################
+
+# Environment variables
+.env
+.env.*
+*.env
+
+# Kubernetes secrets (YAML / JSON)
+*secret*.yaml
+*secret*.yml
+*secrets*.yaml
+*secrets*.yml
+
+# AWS credentials
+.aws/
+**/credentials
+**/config
+
+# SSH keys
+*.pem
+*.key
+*.ppk
+
+########################################
+# 🏗 TERRAFORM (IaC SECURITY)
+########################################
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+terraform.tfstate.backup
+
+# Terraform lock & cache
+.terraform/
+.terraform.lock.hcl
+
+# Terraform variable files
+*.tfvars
+*.tfvars.json
+
+########################################
+# 🐳 DOCKER
+########################################
+
+# Docker runtime files
+docker-compose.override.yml
+.docker/
+
+########################################
+# ⚙ JENKINS
+########################################
+
+# Jenkins local configs / secrets
+jenkins_home/
+jenkins_backup/
+jenkins*.xml
+secrets/
+
+########################################
+# 📦 NODE / MERN
+########################################
+
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# React build output
+build/
+dist/
+
+# Cache
+.cache/
+.parcel-cache/
+
+########################################
+# 🧪 TESTING / COVERAGE
+########################################
+
+coverage/
+.nyc_output/
+
+########################################
+# 💻 OS / IDE
+########################################
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+########################################
+# 📜 LOGS
+########################################
+
+*.log
+
+########################################
+# 🔐 CERTIFICATES
+########################################
+
+*.crt
+*.cer
+*.pfx
+*.jks
