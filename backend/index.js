@@ -41,7 +41,7 @@ app.get('/started', (req, res) => {
 });
 
 // app.use("/api/tasks", tasks);
-app.use("/api", require("./routes/tasks"));
+app.use("/api/tasks", require("./routes/tasks"));
 
 
 const port = process.env.PORT || 3500;
