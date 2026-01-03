@@ -40,7 +40,9 @@ app.get('/started', (req, res) => {
     res.status(200).send('Started');
 });
 
-app.use("/api/tasks", tasks);
+// app.use("/api/tasks", tasks);
+app.use("/api", require("./routes/tasks"));
+
 
 const port = process.env.PORT || 3500;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
