@@ -1,25 +1,3 @@
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: frontend
-# spec:
-#   replicas: 2
-#   selector:
-#     matchLabels:
-#       app: frontend
-#   template:
-#     metadata:
-#       labels:
-#         app: frontend
-#     spec:
-#       containers:
-#       - name: frontend
-#         image: 212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-frontend:IMAGE_TAG
-#         ports:
-#         - containerPort: 80
-#         env:
-#         - name: REACT_APP_API_URL
-#           value: "http://backend.default.svc.cluster.local:5000"
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -39,6 +17,10 @@ spec:
         image: 212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-frontend:IMAGE_TAG
         ports:
         - containerPort: 80
-        # env:
-        # - name: REACT_APP_BACKEND_URL
-        #   value: "http://backend:3500"
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
