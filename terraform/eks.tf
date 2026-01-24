@@ -20,3 +20,11 @@ resource "aws_eks_cluster" "mern_eks" {
     Name = "mern-eks"
   }
 }
+
+###########################################
+# OUTPUT: OIDC ISSUER URL (REQUIRED FOR IRSA)
+###########################################
+output "eks_oidc_issuer" {
+  description = "OIDC issuer URL for IRSA"
+  value       = aws_eks_cluster.mern_eks.identity[0].oidc[0].issuer
+}

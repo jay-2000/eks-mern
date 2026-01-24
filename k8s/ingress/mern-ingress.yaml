@@ -3,15 +3,25 @@ kind: Ingress
 metadata:
   name: mern-ingress
   annotations:
-    #kubernetes.io/ingress.class: alb
-    
+    kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/group.name: mern
 spec:
-  ingressClassName: alb
   rules:
     - http:
         paths:
+          # Backend API
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 3500
+
+          # Frontend (React)
           - path: /
             pathType: Prefix
             backend:

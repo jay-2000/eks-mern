@@ -42,6 +42,9 @@ resource "aws_instance" "jenkins" {
   vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
   key_name               = var.jenkins_key
 
+  iam_instance_profile = aws_iam_instance_profile.jenkins_profile.name
+
+
   user_data = <<-EOF
     #!/bin/bash
     apt update -y

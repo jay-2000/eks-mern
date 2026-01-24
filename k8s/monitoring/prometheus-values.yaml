@@ -1,0 +1,19 @@
+alertmanager:
+  enabled: true
+  config: null   # 🔥 MUST be null
+
+prometheus:
+  prometheusSpec:
+    ruleSelector:
+      matchLabels:
+        prometheus-rule: enabled
+
+    ruleNamespaceSelector: {}
+
+    alertmanagerConfigSelector:
+      matchLabels:
+        alertmanager-config: enabled
+
+    alertmanagerConfigNamespaceSelector:
+      matchLabels:
+        alertmanager-config: enabled

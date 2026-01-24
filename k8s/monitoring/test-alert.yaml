@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: slack-fire-now
+  namespace: monitoring
+  labels:
+    prometheus-rule: enabled   # 🔥 THIS is the key
+spec:
+  groups:
+  - name: test.rules
+    rules:
+    - alert: SlackFireNow
+      expr: vector(1)
+      for: 10s
+      labels:
+        severity: critical
+        namespace: monitoring
+      annotations:
+        summary: "🚨 FINAL Slack Test"
+        description: "Slack integration from EKS Alertmanager is WORKING."

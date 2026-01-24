@@ -115,4 +115,6 @@ desktop.ini
 *.jks
 
 
-monitoring/*secrets*.yaml
+monitoring-alerts/*secrets*.yaml
+monitoring-alerts/alertmanager-slack.yaml
+k8s/**/mongo-secret.yaml

@@ -1,0 +1,134 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: backend-alerts
+  namespace: monitoring
+  labels:
+    prometheus-rule: enabled
+spec:
+  groups:
+  - name: backend.rules
+    rules:
+
+    # 1️⃣ Backend Service DOWN (already verified)
+    - alert: BackendServiceDown
+      expr: |
+        absent(
+          kube_endpointslice_endpoints{
+            namespace="default",
+            endpointslice=~"backend-.*",
+            ready="true"
+          }
+        )
+      for: 0s
+      labels:
+        severity: critical
+        service: backend
+        namespace: monitoring
+      annotations:
+        summary: "🔥 Backend service is DOWN"
+        description: "No READY backend endpoints available (all pods down)."
+
+    # 2️⃣ Backend Pod CrashLoopBackOff
+    - alert: BackendPodCrashLooping
+      expr: |
+        kube_pod_container_status_waiting_reason{
+          namespace="default",
+          pod=~"backend-.*",
+          reason="CrashLoopBackOff"
+        } > 0
+      for: 2m
+      labels:
+        severity: critical
+        service: backend
+        namespace: monitoring
+      annotations:
+        summary: "🚨 Backend pod crash looping"
+        description: "Backend pod {{ $labels.pod }} is in CrashLoopBackOff."
+
+    # 3️⃣ Backend High Memory Usage (>75%)
+    - alert: BackendHighMemoryUsage
+      expr: |
+        (
+          container_memory_working_set_bytes{
+            namespace="default",
+            pod=~"backend-.*",
+            container!="POD"
+          }
+          /
+          container_spec_memory_limit_bytes{
+            namespace="default",
+            pod=~"backend-.*",
+            container!="POD"
+          }
+        ) * 100 > 75
+      for: 3m
+      labels:
+        severity: warning
+        service: backend
+        namespace: monitoring
+      annotations:
+        summary: "⚠️ Backend memory usage high"
+        description: "Backend pod {{ $labels.pod }} memory usage >75%."
+
+    # 4️⃣ Backend High CPU Usage (>70%)
+    - alert: BackendHighCPUUsage
+      expr: |
+        (
+          rate(container_cpu_usage_seconds_total{
+            namespace="default",
+            pod=~"backend-.*",
+            container!="POD"
+          }[2m])
+          /
+          (
+            container_spec_cpu_quota{
+              namespace="default",
+              pod=~"backend-.*",
+              container!="POD"
+            }
+            /
+            container_spec_cpu_period{
+              namespace="default",
+              pod=~"backend-.*",
+              container!="POD"
+            }
+          )
+        ) * 100 > 70
+      for: 3m
+      labels:
+        severity: warning
+        service: backend
+        namespace: monitoring
+      annotations:
+        summary: "⚠️ Backend CPU usage high"
+        description: "Backend pod {{ $labels.pod }} CPU usage >70%."
+
+# apiVersion: monitoring.coreos.com/v1
+# kind: PrometheusRule
+# metadata:
+#   name: backend-alerts
+#   namespace: monitoring
+#   labels:
+#     prometheus-rule: enabled
+# spec:
+#   groups:
+#   - name: backend.rules
+#     rules:
+#     - alert: BackendServiceDown
+#       expr: |
+#         absent(
+#           kube_endpointslice_endpoints{
+#             namespace="default",
+#             endpointslice=~"backend-.*",
+#             ready="true"
+#           }
+#         )
+#       for: 0s
+#       labels:
+#         severity: critical
+#         service: backend
+#         namespace: monitoring   # ✅ THIS MUST BE monitoring
+#       annotations:
+#         summary: "🔥 Backend service is DOWN"
+#         description: "No READY backend endpoints available (all pods down)."

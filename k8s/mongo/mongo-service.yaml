@@ -2,8 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongodb
+  namespace: mongo
 spec:
-  clusterIP: None  # headless service for statefulset
+  clusterIP: None          # Headless service (IMPORTANT)
   selector:
     app: mongodb
   ports:
