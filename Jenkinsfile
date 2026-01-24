@@ -217,6 +217,7 @@ pipeline {
 
         IMAGE_TAG      = "${BUILD_NUMBER}"
         K8S_NAMESPACE  = "default"
+        EKS_CLUSTER    = "eks-mern-cluster"
     }
 
     stages {
@@ -230,9 +231,11 @@ pipeline {
         stage("Configure kubeconfig") {
             steps {
                 sh '''
+                set -e
                 aws eks update-kubeconfig \
                   --region $AWS_REGION \
-                  --name <EKS_CLUSTER_NAME>
+                  --name $EKS_CLUSTER
+                kubectl config current-context
                 '''
             }
         }
@@ -240,6 +243,7 @@ pipeline {
         stage("Login to Amazon ECR") {
             steps {
                 sh '''
+                set -e
                 aws ecr get-login-password --region $AWS_REGION \
                   | docker login --username AWS --password-stdin $ECR_REGISTRY
                 '''
@@ -249,6 +253,7 @@ pipeline {
         stage("Build & Push Backend Image") {
             steps {
                 sh '''
+                set -e
                 cd backend
                 docker build -t $ECR_REGISTRY/$BACKEND_REPO:$IMAGE_TAG .
                 docker push $ECR_REGISTRY/$BACKEND_REPO:$IMAGE_TAG
@@ -259,6 +264,7 @@ pipeline {
         stage("Build & Push Frontend Image") {
             steps {
                 sh '''
+                set -e
                 cd frontend
                 docker build -t $ECR_REGISTRY/$FRONTEND_REPO:$IMAGE_TAG .
                 docker push $ECR_REGISTRY/$FRONTEND_REPO:$IMAGE_TAG
@@ -269,6 +275,7 @@ pipeline {
         stage("Deploy to EKS") {
             steps {
                 sh '''
+                set -e
                 export IMAGE_TAG=$IMAGE_TAG
 
                 envsubst < k8s/backend/backend-deployment.yaml | kubectl apply -f -
@@ -283,6 +290,7 @@ pipeline {
         stage("Verify Kubernetes Rollout") {
             steps {
                 sh '''
+                set -e
                 kubectl rollout status deployment/backend -n $K8S_NAMESPACE --timeout=300s
                 kubectl rollout status deployment/frontend -n $K8S_NAMESPACE --timeout=300s
                 kubectl get pods -n $K8S_NAMESPACE
@@ -293,9 +301,7 @@ pipeline {
 
     post {
         always {
-            sh '''
-            docker system prune -af || true
-            '''
+            sh 'docker system prune -af || true'
         }
 
         success {
@@ -304,7 +310,6 @@ pipeline {
 
         failure {
             echo "❌ CI/CD pipeline failed"
-
             sh '''
             kubectl get pods -n $K8S_NAMESPACE
             kubectl describe pods -n $K8S_NAMESPACE | tail -n 50
