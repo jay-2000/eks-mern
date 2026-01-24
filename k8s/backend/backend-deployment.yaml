@@ -45,6 +45,12 @@ metadata:
     app: backend
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  
   selector:
     matchLabels:
       app: backend
