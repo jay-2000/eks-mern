@@ -217,7 +217,7 @@ pipeline {
 
         IMAGE_TAG      = "${BUILD_NUMBER}"
         K8S_NAMESPACE  = "default"
-        EKS_CLUSTER    = "eks-mern-cluster"
+        EKS_CLUSTER    = "mern-eks"
     }
 
     stages {
