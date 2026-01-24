@@ -44,6 +44,12 @@ resource "aws_instance" "jenkins" {
 
   iam_instance_profile = aws_iam_instance_profile.jenkins_profile.name
 
+  root_block_device {
+    volume_size = 40     # 30–50 GB recommended
+    volume_type = "gp3"
+    delete_on_termination = true
+  }
+
 
   user_data = <<-EOF
     #!/bin/bash
