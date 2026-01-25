@@ -395,7 +395,7 @@ pipeline {
             steps {
                 sh '''
                 set -e
-                kubectl apply -f k8s/mongo/ -n default
+                kubectl apply -f k8s/mongo/
                 kubectl rollout status statefulset/mongodb -n default --timeout=300s
                 '''
             }
