@@ -328,16 +328,14 @@ pipeline {
     environment {
         AWS_REGION     = "ap-south-1"
         AWS_ACCOUNT_ID = "212105053723"
-        ECR_REGISTRY   = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        AWS_PAGER      = ""
 
+        ECR_REGISTRY   = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
         BACKEND_REPO   = "mern-backend"
         FRONTEND_REPO  = "mern-frontend"
-
         IMAGE_TAG      = "${BUILD_NUMBER}"
         K8S_NAMESPACE  = "default"
         EKS_CLUSTER    = "mern-eks"
-
-        AWS_PAGER      = ""        // 🔑 prevents AWS CLI hanging in Jenkins
     }
 
     stages {
