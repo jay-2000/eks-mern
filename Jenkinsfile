@@ -419,7 +419,7 @@ pipeline {
             steps {
                 sh '''
                 set -e
-                kubectl rollout status deployment/backend -n $K8S_NAMESPACE --timeout=300s
+                kubectl rollout status deployment/backend -n $K8S_NAMESPACE --timeout=600s
                 kubectl rollout status deployment/frontend -n $K8S_NAMESPACE --timeout=300s
                 kubectl get pods -n $K8S_NAMESPACE -o wide
                 '''

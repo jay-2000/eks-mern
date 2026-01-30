@@ -2,7 +2,9 @@
 # SECURITY GROUP FOR JENKINS
 #############################################
 resource "aws_security_group" "jenkins_sg" {
-  vpc_id = aws_vpc.main.id
+  name        = "jenkins-sg"
+  description = "Allow SSH and Jenkins UI"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     description = "SSH"
@@ -33,10 +35,15 @@ resource "aws_security_group" "jenkins_sg" {
 }
 
 #############################################
-# JENKINS EC2 INSTANCE (AUTO INSTALL)
+# IAM INSTANCE PROFILE (already exists)
+#############################################
+# Uses: aws_iam_instance_profile.jenkins_profile
+
+#############################################
+# JENKINS EC2 INSTANCE (SYSTEMD INSTALL)
 #############################################
 resource "aws_instance" "jenkins" {
-  ami                    = "ami-0ff91eb5c6fe7cc86"   # Valid Ubuntu 22.04 for ap-south-1
+  ami                    = "ami-0f5ee92e2d63afc18" # Ubuntu 22.04 ap-south-1
   instance_type          = "t3.medium"
   subnet_id              = aws_subnet.public[0].id
   vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
@@ -45,36 +52,65 @@ resource "aws_instance" "jenkins" {
   iam_instance_profile = aws_iam_instance_profile.jenkins_profile.name
 
   root_block_device {
-    volume_size = 40     # 30–50 GB recommended
-    volume_type = "gp3"
+    volume_size           = 40
+    volume_type           = "gp3"
     delete_on_termination = true
   }
 
-
   user_data = <<-EOF
     #!/bin/bash
-    apt update -y
-    apt install -y openjdk-17-jdk docker.io apt-transport-https wget gnupg
+    set -e
+    exec > /var/log/jenkins-userdata.log 2>&1
 
-    systemctl start docker
+    echo "===== Jenkins installation started ====="
+
+    apt-get update -y
+    apt-get install -y \
+      openjdk-17-jdk \
+      curl \
+      wget \
+      gnupg \
+      apt-transport-https \
+      ca-certificates \
+      software-properties-common \
+      docker.io \
+      unzip
+
     systemctl enable docker
+    systemctl start docker
+
     usermod -aG docker ubuntu
 
-    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | tee \
-      /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+    # Jenkins GPG key (2023+)
+    curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key \
+      | gpg --dearmor \
+      | tee /usr/share/keyrings/jenkins-keyring.gpg > /dev/null
 
-    echo deb [signed-by=/usr/share-keyrings/jenkins-keyring.asc] \
-      https://pkg.jenkins.io/debian-stable binary/ | tee \
-      /etc/apt/sources.list.d/jenkins.list > /dev/null
+    echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.gpg] https://pkg.jenkins.io/debian-stable binary/" \
+      | tee /etc/apt/sources.list.d/jenkins.list
 
-    apt update -y
-    apt install -y jenkins
+    apt-get update -y
+    apt-get install -y jenkins
 
-    systemctl start jenkins
+    systemctl daemon-reload
     systemctl enable jenkins
+    systemctl start jenkins
+
+    # AWS CLI v2
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    ./aws/install
+
+    # kubectl
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+    echo "===== Jenkins installation completed ====="
   EOF
 
   tags = {
     Name = "Jenkins-Server"
   }
 }
+
+
