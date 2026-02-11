@@ -89,6 +89,11 @@ app.get("/started", (req, res) => {
   res.status(200).send("Started");
 });
 
+app.get("/api/healthz", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+
 app.use("/api/tasks", require("./routes/tasks"));
 
 /* 🔑 FIX IS HERE */

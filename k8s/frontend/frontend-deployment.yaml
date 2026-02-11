@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: 212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-frontend:latest
+        image: 212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-frontend:${IMAGE_TAG}
         ports:
         - containerPort: 80
         resources:
