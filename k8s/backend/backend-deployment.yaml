@@ -76,8 +76,8 @@ spec:
 
       containers:
       - name: backend
-        image: 212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-backend:19
-        imagePullPolicy: IfNotPresent
+        image: 212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-backend:${IMAGE_TAG}
+        imagePullPolicy: Always
 
         ports:
         - containerPort: 3500
