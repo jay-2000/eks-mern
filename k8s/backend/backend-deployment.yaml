@@ -45,25 +45,60 @@ metadata:
     app: backend
 spec:
   replicas: 2
+
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 0
       maxSurge: 1
-  
+
   selector:
     matchLabels:
       app: backend
+
   template:
     metadata:
       labels:
         app: backend
+
     spec:
+      terminationGracePeriodSeconds: 30
+
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: backend
+              topologyKey: kubernetes.io/hostname
+
       containers:
       - name: backend
-        image: 212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-backend:${IMAGE_TAG}
+        image: 212105053723.dkr.ecr.ap-south-1.amazonaws.com/mern-backend:19
+        imagePullPolicy: IfNotPresent
+
         ports:
         - containerPort: 3500
+
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            secretKeyRef:
+              name: backend-secret
+              key: NODE_ENV
+
+        - name: MONGO_CONN_STR
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-uri
 
         startupProbe:
           httpGet:
@@ -90,28 +125,10 @@ spec:
           timeoutSeconds: 2
           failureThreshold: 3
 
-        # env:
-        # - name: MONGO_CONN_STR
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: backend-secret
-        #       key: MONGO_CONN_STR
-        # - name: NODE_ENV
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: backend-secret
-        #       key: NODE_ENV
-
-        env:
-        - name: NODE_ENV
-          value: "production"
-
-        - name: MONGO_URI
-          valueFrom:
-            secretKeyRef:
-              name: mongo-secret
-              key: mongo-uri
-
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sh", "-c", "sleep 10"]
 
         resources:
           requests:

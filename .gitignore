@@ -118,3 +118,6 @@ desktop.ini
 monitoring-alerts/*secrets*.yaml
 monitoring-alerts/alertmanager-slack.yaml
 k8s/**/mongo-secret.yaml
+*.tfstate*
+terraform_state_backup.json
+terraform_resources_backup.txt

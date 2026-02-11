@@ -2,14 +2,18 @@ variable "cluster_name" {
   default = "mern-eks"
 }
 
-variable "instance_type" {
-  default = "t3.medium"
+variable "vpc_cidr" {
+  default = "10.0.0.0/16"
 }
 
-variable "jenkins_key" {
-  default = "mylogin"
+variable "public_subnets" {
+  default = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
-variable "region" {
-  default = "ap-south-1"
+variable "private_subnets" {
+  default = ["10.0.101.0/24", "10.0.102.0/24"]
+}
+
+variable "key_name" {
+  description = "Existing EC2 keypair name"
 }
