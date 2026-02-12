@@ -1,19 +1,49 @@
 alertmanager:
   enabled: true
-  config: null   # 🔥 MUST be null
+
+  alertmanagerSpec:
+    replicas: 1
+
+    alertmanagerConfigSelector:
+      matchLabels:
+        alertmanager-config: enabled
+
+    alertmanagerConfigNamespaceSelector: {}   # ✅ FIXED
+
+    storage: {}
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+
 
 prometheus:
   prometheusSpec:
+
+    replicas: 1
+
     ruleSelector:
       matchLabels:
         prometheus-rule: enabled
 
     ruleNamespaceSelector: {}
 
-    alertmanagerConfigSelector:
-      matchLabels:
-        alertmanager-config: enabled
+    retention: 2d
 
-    alertmanagerConfigNamespaceSelector:
-      matchLabels:
-        alertmanager-config: enabled
+    storageSpec: {}
+
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+
+grafana:
+  enabled: true

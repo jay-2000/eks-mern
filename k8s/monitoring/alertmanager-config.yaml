@@ -5,21 +5,14 @@ metadata:
   namespace: monitoring
   labels:
     alertmanager-config: enabled
+
 spec:
   route:
     receiver: slack-notifications
-    groupBy: ["alertname", "namespace"]
+    groupBy: ["alertname"]
     groupWait: 10s
     groupInterval: 1m
     repeatInterval: 4h
-    matchers:
-    - name: namespace
-      value: monitoring
-    routes:
-    - receiver: slack-notifications
-      matchers:
-      - name: service
-        value: backend
 
   receivers:
   - name: slack-notifications
@@ -31,8 +24,7 @@ spec:
       sendResolved: true
       title: "{{ .CommonAnnotations.summary }}"
       text: |-
-        *Alertname:* {{ .CommonLabels.alertname }}
+        🚨 *Alert:* {{ .CommonLabels.alertname }}
         *Severity:* {{ .CommonLabels.severity }}
-        *Service:* {{ .CommonLabels.service }}
         *Namespace:* {{ .CommonLabels.namespace }}
         *Description:* {{ .CommonAnnotations.description }}
