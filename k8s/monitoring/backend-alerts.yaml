@@ -103,32 +103,3 @@ spec:
       annotations:
         summary: "⚠️ Backend CPU usage high"
         description: "Backend pod {{ $labels.pod }} CPU usage >70%."
-
-# apiVersion: monitoring.coreos.com/v1
-# kind: PrometheusRule
-# metadata:
-#   name: backend-alerts
-#   namespace: monitoring
-#   labels:
-#     prometheus-rule: enabled
-# spec:
-#   groups:
-#   - name: backend.rules
-#     rules:
-#     - alert: BackendServiceDown
-#       expr: |
-#         absent(
-#           kube_endpointslice_endpoints{
-#             namespace="default",
-#             endpointslice=~"backend-.*",
-#             ready="true"
-#           }
-#         )
-#       for: 0s
-#       labels:
-#         severity: critical
-#         service: backend
-#         namespace: monitoring   # ✅ THIS MUST BE monitoring
-#       annotations:
-#         summary: "🔥 Backend service is DOWN"
-#         description: "No READY backend endpoints available (all pods down)."
